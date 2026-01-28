@@ -1,0 +1,50 @@
+version: 0.2
+
+# This buildspec.yml should be placed in the root of your lambda-demo-merapar repository
+# It tells CodeBuild how to package and deploy your Lambda function
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.11
+    commands:
+      - echo "Installing build dependencies..."
+      - pip install --upgrade pip
+
+  pre_build:
+    commands:
+      - echo "Installing application dependencies..."
+      - |
+        if [ -f requirements.txt ]; then
+          pip install -r requirements.txt -t .
+        else
+          echo "No requirements.txt found, skipping dependency installation"
+        fi
+
+  build:
+    commands:
+      - echo "Packaging Lambda function..."
+      - echo "Creating deployment package..."
+      # Exclude unnecessary files from the package
+      - zip -r lambda-deployment.zip . -x "*.git*" "buildspec.yml" "*.md" "tests/*" "__pycache__/*" "*.pyc"
+      - echo "Package created successfully"
+
+  post_build:
+    commands:
+      - echo "Updating Lambda function..."
+      - |
+        aws lambda update-function-code \
+          --function-name $LAMBDA_FUNCTION_NAME \
+          --zip-file fileb://lambda-deployment.zip \
+          --region $AWS_DEFAULT_REGION
+      - echo "Lambda function updated successfully"
+      - echo "Deployment completed at $(date)"
+
+artifacts:
+  files:
+    - lambda-deployment.zip
+  name: LambdaBuildArtifact
+
+cache:
+  paths:
+    - '.pip-cache/**/*'

@@ -40,3 +40,22 @@ variable "lambda_log_retention_days" {
   type        = number
   default     = 7
 }
+
+# CodePipeline Configuration Variables
+variable "github_repository" {
+  description = "GitHub repository in format: owner/repo-name"
+  type        = string
+  default     = "cloudtel-cl/lambda-demo-merapar"
+}
+
+variable "github_branch" {
+  description = "GitHub branch to trigger pipeline"
+  type        = string
+  default     = "main"
+}
+
+variable "buildspec_path" {
+  description = "Path to buildspec file in the repository"
+  type        = string
+  default     = "buildspec.yml"
+}

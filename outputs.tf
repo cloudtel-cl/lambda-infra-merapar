@@ -50,3 +50,34 @@ output "deployment_info" {
     region      = var.aws_region
   }
 }
+
+# CodePipeline Outputs
+output "codepipeline_name" {
+  description = "Name of the CodePipeline"
+  value       = aws_codepipeline.lambda_pipeline.name
+}
+
+output "codepipeline_arn" {
+  description = "ARN of the CodePipeline"
+  value       = aws_codepipeline.lambda_pipeline.arn
+}
+
+output "codebuild_project_name" {
+  description = "Name of the CodeBuild project"
+  value       = aws_codebuild_project.lambda_build.name
+}
+
+output "github_connection_arn" {
+  description = "ARN of the GitHub CodeStar connection (requires manual activation)"
+  value       = aws_codestarconnections_connection.github.arn
+}
+
+output "github_connection_status" {
+  description = "Status of the GitHub connection"
+  value       = aws_codestarconnections_connection.github.connection_status
+}
+
+output "pipeline_artifacts_bucket" {
+  description = "S3 bucket for pipeline artifacts"
+  value       = aws_s3_bucket.pipeline_artifacts.id
+}
