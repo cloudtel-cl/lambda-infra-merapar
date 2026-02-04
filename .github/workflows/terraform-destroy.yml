@@ -1,0 +1,46 @@
+name: Terraform Destroy to AWS
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write   # Required for OIDC authentication
+  contents: read    # Required to checkout code
+
+env:
+  AWS_REGION: us-east-1
+  TERRAFORM_VERSION: 1.9.0
+
+jobs:
+  terraform-Destroy:
+    name: Destroy Infrastructure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::274967238699:role/admin-access-demo-merapar-role
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: GitHubActions-TerraformDeploy
+
+      - name: Verify AWS identity
+        run: |
+          aws sts get-caller-identity
+          echo "Successfully authenticated to AWS"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Destroy
+        id: destroy
+        run: terraform destroy -auto-approve
